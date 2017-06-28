@@ -15,9 +15,9 @@ addpath('ximu_matlab_library');
 %startTime = 10;
 %stopTime = 35;
 
-filePath = 'Biolab-Datasets/coleta3';
+filePath = 'Biolab-Datasets/coleta1';
 startTime = 10;
-stopTime = 55;
+stopTime = 37.5;
 
 % filePath = 'Datasets/stairsAndCorridor';
 % startTime = 5;
@@ -79,7 +79,7 @@ stationary = acc_magFilt < 0.05;
 
 % -------------------------------------------------------------------------
 % Plot data raw sensor data and stationary periods
-figure('Position', [1300 10 900 600], 'Name', 'Sensor Data');
+figure('Position', [9 39.0 900.0 600], 'Name', 'Sensor Data');
 ax(1) = subplot(2,1,1);
     hold on; grid on;
     plot(time, gyrX, 'r');
@@ -141,7 +141,7 @@ acc = quaternRotate([accX accY accZ], quaternConj(quat));
 acc = acc * 9.81;
 
 % Plot translational accelerations
-figure('Position', [1300 10 900 300], 'Name', 'Accelerations');
+figure('Position', [9 39 900 300], 'Name', 'Accelerations');
 hold on; grid on;
 plot(time, acc(:,1), 'r');
 plot(time, acc(:,2), 'g');
@@ -182,7 +182,7 @@ end
 vel = vel - velDrift;
 
 % Plot translational velocity
-figure('Position', [1300 10 900 300], 'Name', 'Velocity');
+figure('Position', [9 39 900 300], 'Name', 'Velocity');
 hold on; grid on;
 plot(time, vel(:,1), 'r');
 plot(time, vel(:,2), 'g');
@@ -203,7 +203,7 @@ for t = 2:length(pos)
 end
 
 % Plot translational position
-figure('Position', [1300 10 900 600], 'Name', 'Position');
+figure('Position', [9 39 900 600], 'Name', 'Position');
 hold on; grid on;
 plot(time, pos(:,1), 'r');
 plot(time, pos(:,2), 'g');
