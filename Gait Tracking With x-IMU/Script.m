@@ -72,8 +72,7 @@ stationary = acc_magFilt < 0.05;
 
 % -------------------------------------------------------------------------
 % Plot data raw sensor data and stationary periods
-
-figure('Position', [9 39 900 600], 'Number', 'off', 'Name', 'Sensor Data');
+figure('Position', [9 39.0 900.0 600], 'Name', 'Sensor Data');
 ax(1) = subplot(2,1,1);
     hold on;
     plot(time, gyrX, 'r');
@@ -135,7 +134,7 @@ acc = quaternRotate([accX accY accZ], quaternConj(quat));
 acc = acc * 9.81;
 
 % Plot translational accelerations
-figure('Position', [9 39 900 300], 'Number', 'off', 'Name', 'Accelerations');
+figure('Position', [9 39 900 300], 'Name', 'Accelerations');
 hold on;
 plot(time, acc(:,1), 'r');
 plot(time, acc(:,2), 'g');
@@ -176,7 +175,7 @@ end
 vel = vel - velDrift;
 
 % Plot translational velocity
-figure('Position', [9 39 900 300], 'Number', 'off', 'Name', 'Velocity');
+figure('Position', [9 39 900 300], 'Name', 'Velocity');
 hold on;
 plot(time, vel(:,1), 'r');
 plot(time, vel(:,2), 'g');
@@ -197,7 +196,7 @@ for t = 2:length(pos)
 end
 
 % Plot translational position
-figure('Position', [9 39 900 600], 'Number', 'off', 'Name', 'Position');
+figure('Position', [9 39 900 600], 'Name', 'Position');
 hold on;
 plot(time, pos(:,1), 'r');
 plot(time, pos(:,2), 'g');
