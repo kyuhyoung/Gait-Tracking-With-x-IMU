@@ -32,9 +32,21 @@ Fs = 200
 % startTime = 10;
 % stopTime = 50;
 
-filePath = 'Biolab-Datasets-bin/leituras3';
-startTime = 15;
-stopTime = 42;
+% filePath = 'Biolab-Datasets-bin/leituras3';
+% startTime = 15;
+% stopTime = 42;
+
+% filePath = 'Biolab-Datasets-bin/leituras4';
+% startTime = 10;
+% stopTime = 47;
+
+% filePath = 'Biolab-Datasets-bin/leituras5';
+% startTime = 2;
+% stopTime = 17;
+
+filePath = 'Biolab-Datasets-bin/leituras6';
+startTime = 1;
+stopTime = 148;
 
 % filePath = 'Datasets/straightLine';
 % startTime = 6;
@@ -94,14 +106,14 @@ filtCutOff = 5;
 acc_magFilt = filtfilt(b, a, acc_magFilt);
 
 % Threshold detection
-stationaty_start_time = acc_magFilt(1:(startTime+2)*Fs);
+stationaty_start_time = acc_magFilt(1:(startTime+1)*Fs);
 statistical_stationary_threshold = mean(stationaty_start_time) + 2*std(stationaty_start_time);
 stationary_threshold = 0.05;
 
 disp(['Limiar Calculado = ', num2str(mean(stationaty_start_time)), ' + 2 * ',num2str(std(stationaty_start_time)), ' = ', num2str(statistical_stationary_threshold)]);
 disp(['Limiar Fixo = ', num2str(stationary_threshold)]);
 
-stationary = acc_magFilt < stationary_threshold;
+stationary = acc_magFilt < 0.05;
 
 % -------------------------------------------------------------------------
 % Plot data raw sensor data and stationary periods
@@ -258,7 +270,7 @@ posPlot = [posPlot; [posPlot(end, 1)*onesVector, posPlot(end, 2)*onesVector, pos
 quatPlot = [quatPlot; [quatPlot(end, 1)*onesVector, quatPlot(end, 2)*onesVector, quatPlot(end, 3)*onesVector, quatPlot(end, 4)*onesVector]];
 
 % Create 6 DOF animation
-SamplePlotFreq = 8;
+SamplePlotFreq = 4;
 Spin = 120;
 SixDofAnimation(posPlot, quatern2rotMat(quatPlot), ...
                 'SamplePlotFreq', SamplePlotFreq, 'Trail', 'All', ...
