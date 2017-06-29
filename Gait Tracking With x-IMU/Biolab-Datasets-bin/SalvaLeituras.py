@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys 
 import serial
 from datetime import datetime
 
+
 arduinoData = serial.Serial()
-arduinoData.port = '/dev/rfcomm0'
+arduinoData.port = str(sys.argv[1])
 arduinoData.baudrate = 115200
 arduinoData.timeout = 1
 arduinoData.open()
