@@ -24,9 +24,13 @@ Fs = 200
 % stopTime = 55;
 
 
-filePath = 'Biolab-Datasets-bin/leituras';
-startTime = 9;
-stopTime = 24;
+% filePath = 'Biolab-Datasets-bin/leituras';
+% startTime = 9;
+% stopTime = 24;
+
+filePath = 'Biolab-Datasets-bin/leituras2';
+startTime = 10;
+stopTime = 50;
 
 
 % filePath = 'Datasets/straightLine';
