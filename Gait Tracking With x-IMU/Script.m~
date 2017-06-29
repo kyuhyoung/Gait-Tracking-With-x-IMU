@@ -7,9 +7,8 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-%Fs = 100
-Fs = 200
-%Fs = 256
+Fs = 200;
+%Fs = 256;
 
 % filePath = 'Biolab-Datasets/coleta1';
 % startTime = 8;
@@ -19,14 +18,14 @@ Fs = 200
 % startTime = 8;
 % stopTime = 35;
 
-% filePath = 'Biolab-Datasets/coleta3';
+% filePath = 'Biolab-Datasets-bin/coleta3';
 % startTime = 8;
 % stopTime = 55;
 
 
-filePath = 'Biolab-Datasets-bin/leituras';
-startTime = 9;
-stopTime = 24;
+filePath = 'Biolab-Datasets-bin/leituras_2017-06-28';
+startTime = 1;
+stopTime = 60;
 
 
 % filePath = 'Datasets/straightLine';
@@ -52,6 +51,7 @@ accX = xIMUdata.CalInertialAndMagneticData.Accelerometer.X;
 accY = xIMUdata.CalInertialAndMagneticData.Accelerometer.Y;
 accZ = xIMUdata.CalInertialAndMagneticData.Accelerometer.Z;
 clear('xIMUdata');
+
 % -------------------------------------------------------------------------
 % Manually frame data
 
