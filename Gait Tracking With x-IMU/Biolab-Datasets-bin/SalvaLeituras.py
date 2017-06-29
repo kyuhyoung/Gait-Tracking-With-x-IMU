@@ -2,7 +2,7 @@ import serial
 from datetime import datetime
 
 arduinoData = serial.Serial()
-arduinoData.port = '/dev/ttyUSB0'
+arduinoData.port = '/dev/rfcomm0'
 arduinoData.baudrate = 115200
 arduinoData.timeout = 1
 arduinoData.open()
