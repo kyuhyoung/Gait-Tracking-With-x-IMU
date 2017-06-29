@@ -7,18 +7,30 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-%filePath = 'Biolab-Datasets/coleta1';
-%startTime = 10;
-%stopTime = 37.5;
+Fs = 200;
+%Fs = 256;
 
-%filePath = 'Biolab-Datasets/coleta2';
-%startTime = 10;
-%stopTime = 35;
+% filePath = 'Biolab-Datasets/coleta1';
+% startTime = 8;
+% stopTime = 37.5;
 
-filePath = 'Biolab-Datasets/coleta3';
-startTime = 10;
-stopTime = 55;
+% filePath = 'Biolab-Datasets/coleta2';
+% startTime = 8;
+% stopTime = 35;
 
+% filePath = 'Biolab-Datasets-bin/coleta3';
+% startTime = 8;
+% stopTime = 55;
+
+
+filePath = 'Biolab-Datasets-bin/coletanoite';
+startTime = 1;
+stopTime = 14;
+
+
+% filePath = 'Datasets/straightLine';
+% startTime = 6;
+% stopTime = 26;
 % filePath = 'Datasets/stairsAndCorridor';
 % startTime = 5;
 % stopTime = 
@@ -29,7 +41,7 @@ stopTime = 55;
 % -------------------------------------------------------------------------
 % Import data
 
-samplePeriod = 1/100;
+samplePeriod = 1/Fs;
 xIMUdata = xIMUdataClass(filePath, 'InertialMagneticSampleRate', 1/samplePeriod);
 time = xIMUdata.CalInertialAndMagneticData.Time;
 gyrX = xIMUdata.CalInertialAndMagneticData.Gyroscope.X;
@@ -75,7 +87,14 @@ filtCutOff = 5;
 acc_magFilt = filtfilt(b, a, acc_magFilt);
 
 % Threshold detection
-stationary = acc_magFilt < 0.05;
+stationaty_start_time = acc_magFilt(1:(startTime+2)*Fs);
+statistical_stationary_threshold = mean(stationaty_start_time) + 2*std(stationaty_start_time);
+stationary_threshold = 0.05;
+
+disp(['Limiar Calculado = ', num2str(mean(stationaty_start_time)), ' + 2 * ',num2str(std(stationaty_start_time)), ' = ', num2str(statistical_stationary_threshold)]);
+disp(['Limiar Fixo = ', num2str(stationary_threshold)]);
+
+stationary = acc_magFilt < stationary_threshold;
 
 % -------------------------------------------------------------------------
 % Plot data raw sensor data and stationary periods
@@ -108,7 +127,7 @@ linkaxes(ax,'x');
 % Compute orientation
 
 quat = zeros(length(time), 4);
-AHRSalgorithm = AHRS('SamplePeriod', 1/256, 'Kp', 1, 'KpInit', 1);
+AHRSalgorithm = AHRS('SamplePeriod', 1/Fs, 'Kp', 1, 'KpInit', 1);
 
 % Initial convergence
 initPeriod = 2;
@@ -214,6 +233,8 @@ ylabel('Position (m)');
 legend('X', 'Y', 'Z');
 hold off;
 
+disp('Erro em Z: ')
+disp(abs(pos(length(pos),3)))
 % -------------------------------------------------------------------------
 % Plot 3D foot trajectory
 
@@ -230,7 +251,7 @@ posPlot = [posPlot; [posPlot(end, 1)*onesVector, posPlot(end, 2)*onesVector, pos
 quatPlot = [quatPlot; [quatPlot(end, 1)*onesVector, quatPlot(end, 2)*onesVector, quatPlot(end, 3)*onesVector, quatPlot(end, 4)*onesVector]];
 
 % Create 6 DOF animation
-SamplePlotFreq = 4;
+SamplePlotFreq = 8;
 Spin = 120;
 SixDofAnimation(posPlot, quatern2rotMat(quatPlot), ...
                 'SamplePlotFreq', SamplePlotFreq, 'Trail', 'All', ...
