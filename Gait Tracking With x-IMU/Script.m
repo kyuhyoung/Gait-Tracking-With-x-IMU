@@ -8,52 +8,62 @@ addpath('ximu_matlab_library');
 % Select dataset (comment in/out)
 
 %Fs = 100
-Fs = 200
-%Fs = 256
-
 % filePath = 'Biolab-Datasets/coleta1';
 % startTime = 8;
 % stopTime = 37.5;
 
+%Fs = 100
 % filePath = 'Biolab-Datasets/coleta2';
 % startTime = 8;
 % stopTime = 35;
 
+% Fs = 100
 % filePath = 'Biolab-Datasets/coleta3';
 % startTime = 8;
 % stopTime = 55;
 
 
+%Fs = 200
 % filePath = 'Biolab-Datasets-bin/leituras';
 % startTime = 9;
 % stopTime = 24;
 
+%Fs = 200
 % filePath = 'Biolab-Datasets-bin/leituras2';
 % startTime = 10;
 % stopTime = 50;
 
+%Fs = 200
 % filePath = 'Biolab-Datasets-bin/leituras3';
 % startTime = 15;
 % stopTime = 42;
 
+%Fs = 200
 % filePath = 'Biolab-Datasets-bin/leituras4';
 % startTime = 10;
 % stopTime = 47;
 
+% Fs = 200
 % filePath = 'Biolab-Datasets-bin/leituras5';
 % startTime = 2;
 % stopTime = 17;
 
+Fs = 200
 filePath = 'Biolab-Datasets-bin/leituras6';
 startTime = 1;
 stopTime = 148;
 
+%Fs = 256
 % filePath = 'Datasets/straightLine';
 % startTime = 6;
 % stopTime = 26;
+
+%Fs = 256
 % filePath = 'Datasets/stairsAndCorridor';
 % startTime = 5;
-% stopTime = 
+% stopTime =
+
+%Fs = 256
 % filePath = 'Datasets/spiralStairs';
 % startTime = 4;
 % stopTime = 47;
@@ -252,6 +262,17 @@ ylabel('Position (m)');
 legend('X', 'Y', 'Z');
 hold off;
 
+figure('Position', [1300 10 900 600], 'Name', 'Position');
+hold on; grid on;
+plot(time, pos(:,1), 'r');
+plot(time, pos(:,2), 'g');
+plot(time, pos(:,3), 'b');
+title('Position');
+xlabel('Time (s)');
+ylabel('Position (m)');
+legend('X', 'Y', 'Z');
+hold off;
+
 disp('Erro em Z: ')
 disp(abs(pos(length(pos),3)))
 % -------------------------------------------------------------------------
@@ -270,7 +291,7 @@ posPlot = [posPlot; [posPlot(end, 1)*onesVector, posPlot(end, 2)*onesVector, pos
 quatPlot = [quatPlot; [quatPlot(end, 1)*onesVector, quatPlot(end, 2)*onesVector, quatPlot(end, 3)*onesVector, quatPlot(end, 4)*onesVector]];
 
 % Create 6 DOF animation
-SamplePlotFreq = 4;
+SamplePlotFreq = 20;
 Spin = 120;
 SixDofAnimation(posPlot, quatern2rotMat(quatPlot), ...
                 'SamplePlotFreq', SamplePlotFreq, 'Trail', 'All', ...
