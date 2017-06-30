@@ -7,10 +7,10 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-%Fs = 100
-% filePath = 'Biolab-Datasets/coleta1';
-% startTime = 8;
-% stopTime = 37.5;
+Fs = 100
+filePath = 'Biolab-Datasets/coleta1';
+startTime = 8;
+stopTime = 37.5;
 
 %Fs = 100
 % filePath = 'Biolab-Datasets/coleta2';
@@ -48,10 +48,10 @@ addpath('ximu_matlab_library');
 % startTime = 2;
 % stopTime = 17;
 
-Fs = 200
-filePath = 'Biolab-Datasets-bin/leituras6';
-startTime = 1;
-stopTime = 148;
+% Fs = 200
+% filePath = 'Biolab-Datasets-bin/leituras6';
+% startTime = 1;
+% stopTime = 148;
 
 %Fs = 256
 % filePath = 'Datasets/straightLine';
@@ -262,17 +262,6 @@ ylabel('Position (m)');
 legend('X', 'Y', 'Z');
 hold off;
 
-figure('Position', [1300 10 900 600], 'Name', 'Position');
-hold on; grid on;
-plot(time, pos(:,1), 'r');
-plot(time, pos(:,2), 'g');
-plot(time, pos(:,3), 'b');
-title('Position');
-xlabel('Time (s)');
-ylabel('Position (m)');
-legend('X', 'Y', 'Z');
-hold off;
-
 disp('Erro em Z: ')
 disp(abs(pos(length(pos),3)))
 % -------------------------------------------------------------------------
@@ -291,7 +280,7 @@ posPlot = [posPlot; [posPlot(end, 1)*onesVector, posPlot(end, 2)*onesVector, pos
 quatPlot = [quatPlot; [quatPlot(end, 1)*onesVector, quatPlot(end, 2)*onesVector, quatPlot(end, 3)*onesVector, quatPlot(end, 4)*onesVector]];
 
 % Create 6 DOF animation
-SamplePlotFreq = 20;
+SamplePlotFreq = 4;
 Spin = 120;
 SixDofAnimation(posPlot, quatern2rotMat(quatPlot), ...
                 'SamplePlotFreq', SamplePlotFreq, 'Trail', 'All', ...

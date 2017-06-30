@@ -94,6 +94,8 @@ void loop() {
 void iniciar_sensor() {
   if (accelgyro.testConnection()) {
     accelgyro.initialize(); //Initializes the IMU
+    accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_500); //+-500degress/s
+    accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_4); //+- 4g
     accelgyro.setXAccelOffset(offsets[0]); accelgyro.setYAccelOffset(offsets[1]); accelgyro.setZAccelOffset(offsets[2]);
     accelgyro.setXGyroOffset(offsets[3]); accelgyro.setYGyroOffset(offsets[4]); accelgyro.setZGyroOffset(offsets[5]);
     Serial.print("Sensor configurado com sucesso.\n");
