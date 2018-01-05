@@ -7,20 +7,20 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-Fs = 100
-filePath = 'Biolab-Datasets/coleta1';
-startTime = 8;
-stopTime = 37.5;
+% Fs = 100
+% filePath = 'Biolab-Datasets/coleta1';
+% startTime = 8;
+% stopTime = 37.5;
 
 %Fs = 100
 % filePath = 'Biolab-Datasets/coleta2';
 % startTime = 8;
 % stopTime = 35;
 
-% Fs = 100
-% filePath = 'Biolab-Datasets/coleta3';
-% startTime = 8;
-% stopTime = 55;
+Fs = 100
+filePath = 'Biolab-Datasets/coleta3';
+startTime = 8;
+stopTime = 55;
 
 
 %Fs = 200
