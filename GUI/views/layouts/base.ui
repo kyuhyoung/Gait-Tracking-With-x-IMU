@@ -21,7 +21,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_Graph">
       <item>
-       <widget class="QGraphicsView" name="graphicsView"/>
+       <widget class="PlotWidget" name="graph"/>
       </item>
       <item>
        <widget class="QLabel" name="lbl_StatusGraph">
@@ -254,8 +254,15 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
-  <tabstop>graphicsView</tabstop>
+  <tabstop>graph</tabstop>
   <tabstop>btnStart</tabstop>
   <tabstop>btnA</tabstop>
   <tabstop>btnB</tabstop>

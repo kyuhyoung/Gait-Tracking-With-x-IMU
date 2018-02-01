@@ -19,9 +19,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.verticalLayout_Graph = QtWidgets.QVBoxLayout()
         self.verticalLayout_Graph.setObjectName("verticalLayout_Graph")
-        self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
-        self.graphicsView.setObjectName("graphicsView")
-        self.verticalLayout_Graph.addWidget(self.graphicsView)
+        self.graph = PlotWidget(self.centralwidget)
+        self.graph.setObjectName("graph")
+        self.verticalLayout_Graph.addWidget(self.graph)
         self.lbl_StatusGraph = QtWidgets.QLabel(self.centralwidget)
         self.lbl_StatusGraph.setObjectName("lbl_StatusGraph")
         self.verticalLayout_Graph.addWidget(self.lbl_StatusGraph)
@@ -136,7 +136,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        MainWindow.setTabOrder(self.graphicsView, self.btnStart)
+        MainWindow.setTabOrder(self.graph, self.btnStart)
         MainWindow.setTabOrder(self.btnStart, self.btnA)
         MainWindow.setTabOrder(self.btnA, self.btnB)
         MainWindow.setTabOrder(self.btnB, self.cbSerialPort)
@@ -167,3 +167,4 @@ class Ui_MainWindow(object):
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
         self.actionCommunication_Menu.setText(_translate("MainWindow", "Communication Menu"))
 
+from pyqtgraph import PlotWidget
