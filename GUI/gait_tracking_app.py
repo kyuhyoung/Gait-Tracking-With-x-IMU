@@ -11,19 +11,24 @@
 # Description:
 # ------------------------------------------------------------------------------
 import sys
-# ------------------------------------------------------------------------------
-# PyQt5
-from PyQt5.QtWidgets import *
-from views import base_qt5 as base
-# PyQt4
+if sys.version_info.major == 3:
+    # PyQt5
+    from PyQt5.QtWidgets import *
+    from views import base_qt5 as base
+elif sys.version_info.major == 2:
+    # PyQt4
+    from PyQt4.QtGui import *
+    from views import base_qt4 as base
+else:
+    print("Versao do python nao suportada")
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 
 
-class ExampleApp(QMainWindow, base.Ui_MainWindow):
+class GaitTrackingApp(QMainWindow, base.Ui_MainWindow):
     def __init__(self, parent=None):
-        super(ExampleApp, self).__init__(parent)
+        super(GaitTrackingApp, self).__init__(parent)
         self.setupUi(self)
         self.setup_signals_connections()
         
@@ -36,7 +41,7 @@ class ExampleApp(QMainWindow, base.Ui_MainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    form = ExampleApp()
+    form = GaitTrackingApp()
     form.show()
     app.exec_()
 
