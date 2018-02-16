@@ -167,7 +167,7 @@ class ArduinoHandler:
              - Put the read packet in a buffer (Queue).
         """
         if self.serialPort.isOpen():
-            if self.serialPort.inWaiting() >= ArduinoConstants.PACKET_SIZE:
+            if self.serialPort.inWaiting() >= ArduinoConstants.PACKET_SIZE + (self.qnt_ch - 1)*2:
                 _starter_byte = self.serialPort.read()
                 if chr(ord(_starter_byte)) == ArduinoConstants.PACKET_START:
                     if self.qnt_ch == 1:
@@ -209,7 +209,7 @@ class ArduinoHandler:
 
 
 def test():
-    my_arduino_handler = ArduinoHandler(port_name='/dev/ttyACM0')
+    my_arduino_handler = ArduinoHandler(port_name='/dev/ttyUSB0', qnt_ch=10)
 
     def printer():
         if my_arduino_handler.data_waiting:

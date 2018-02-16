@@ -10,11 +10,6 @@
 # ------------------------------------------------------------------------------
 # Description:
 # ------------------------------------------------------------------------------
-from pyqtgraph.Qt import QtCore
-import pyqtgraph as pg
-from pyqtgraph.ptime import time
-from numpy import clip
-
 import sys
 if sys.version_info.major == 3:
     from queue import Queue
@@ -22,6 +17,11 @@ if sys.version_info.major == 3:
 elif sys.version_info.major == 2:
     from Queue import Queue
     from PyQt4.QtGui import QBrush, QColor, QPen
+
+from pyqtgraph.Qt import QtCore
+import pyqtgraph as pg
+from pyqtgraph.ptime import time
+from numpy import clip
 
 # ------------------------------------------------------------------------------
 

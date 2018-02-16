@@ -17,7 +17,6 @@ from PyQtGraphHandler import PyQtGraphHandler
 
 # ------------------------------------------------------------------------------
 
-
 class QtArduinoPlotter:
     def __init__(self, parent, app=None, label=None):
         """

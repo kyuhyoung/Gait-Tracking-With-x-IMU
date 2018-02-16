@@ -24,6 +24,7 @@
     For easy visualization uncomment the DEBUG_MODE define.
     So the output will be in ASCII instead of binary data.
 */
+#define ACCEL_GYRO_FROM_DMP //If enabled the accel and gyro data will come from the DMP
 //#define DEBUG_MODE
 
 //Se estiver no modo debug printa as msg debug, se nao estiver nao printa
@@ -72,7 +73,7 @@ char serialOp; // Storages the cmd send by serial interface (start,stop,etc)
 bool acquisition_running = true; // flag indication if the acquisition is running or not
 
 MPU6050 mpu(0x68); // MPU6050 object
-const int offsets[6] = {-1196,  -88, 445, 73,  -46, 22}; // Callibration Offsets, you should calculate this with the calibration sketch (github.com/italogfernandes/libraries)
+const int offsets[6] = { -1196,  -88, 445, 73,  -46, 22}; // Callibration Offsets, you should calculate this with the calibration sketch (github.com/italogfernandes/libraries)
 uint8_t fifoBuffer[42]; // FIFO storages fifoBuffer of mpu
 int numbPackets; // Amount of packets to be read in the mpu buffer
 
@@ -86,7 +87,7 @@ void setup() {
   //Serial Communication:
   Serial.begin(UART_BAUDRATE);
   DEBUG_PRINT_("Available commands: s - Start, q - stop.\n");
-  
+
   //Inertial Sensor
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
   Wire.begin();
@@ -153,9 +154,9 @@ void init_inertial_sensor() {
 }
 
 /**
- * Verifies the amount of packets in the inertial sensor fifo,
- * and read every one.
- */
+   Verifies the amount of packets in the inertial sensor fifo,
+   and read every one.
+*/
 void read_inertial_sensor() {
   numbPackets = floor(mpu.getFIFOCount() / PSDMP);
   if (numbPackets >= 24) {
@@ -163,17 +164,38 @@ void read_inertial_sensor() {
     DEBUG_PRINT_("FIFO sensor 1 overflow!\n"); //NOTE: may put a led for indicating is a good idea
   } else {
     while (numbPackets > 0) {
-      mpu.getFIFOBytes(fifoBuffer, PSDMP);
       DEBUG_PRINT_(numbPackets); DEBUG_PRINT_(" - ");
-      send_packet();
       numbPackets--;
+      mpu.getFIFOBytes(fifoBuffer, PSDMP);
+#ifndef ACCEL_GYRO_FROM_DMP
+      int16_t ax, ay, az, gx, gy, gz;
+      mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+      fifoBuffer[28] = (uint8_t) (ax >> 8); //ac_x_msb
+      fifoBuffer[29] = (uint8_t) (ax && 0x00FF); //ac_x_lsb
+
+      fifoBuffer[32] = (uint8_t) (ay >> 8); //ac_y_msb
+      fifoBuffer[33] = (uint8_t) (ay && 0x00FF); //ac_y_lsb
+
+      fifoBuffer[36] = (uint8_t) (az >> 8); //ac_z_msb
+      fifoBuffer[37] = (uint8_t) (az && 0x00FF); //ac_z_lsb
+
+      fifoBuffer[16] = (uint8_t) (gx >> 8); //gy_x_msb
+      fifoBuffer[17] = (uint8_t) (gx && 0x00FF); //gy_x_lsb
+
+      fifoBuffer[20] = (uint8_t) (gy >> 8); //gy_y_msb
+      fifoBuffer[21] = (uint8_t) (gy && 0x00FF); //gy_y_lsb
+
+      fifoBuffer[24] = (uint8_t) (gz >> 8); //gy_z_msb
+      fifoBuffer[25] = (uint8_t) (gz && 0x00FF); //gy_z_lsb
+#endif
+      send_packet();
     }
   }
 }
 
 /**
- * Assembles the packets.
- */
+   Assembles the packets.
+*/
 void send_packet() {
 #ifndef DEBUG_MODE
   //Assembling packet and sending
@@ -215,7 +237,7 @@ void send_packet() {
   g[0] = (float) ((fifoBuffer[16] << 8) | fifoBuffer[17]) / 131.0f;
   g[1] = (float) ((fifoBuffer[20] << 8) | fifoBuffer[21]) / 131.0f;
   g[2] = (float) ((fifoBuffer[24] << 8) | fifoBuffer[25]) / 131.0f;
-  
+
   DEBUG_PRINT_("Quat - Accel - Gyro: \t");
   //Quaternions
   DEBUG_PRINT_(q[0]);
