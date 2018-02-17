@@ -95,7 +95,7 @@ bool handshake_ok = false;
 ///////////////////
 void sendString(const char* msg);
 void iniciarIO(void);
-void piscar_led(uint8_t repeat, uin16_t delay_time);
+void piscar_led(uint8_t repeat, uint16_t delay_time);
 
 void setup() {
     //Pinos
@@ -138,7 +138,7 @@ void main(void) {
                         hal_w2_write(
                             rx_buf[INDEX_ARG1],
                             &rx_buf[INDEX_ARG3],
-                            rx_buf[INDEX_ARG2])
+                            rx_buf[INDEX_ARG2]);
                         break;
                     case CMD_hal_w2_read:
                         tx_buf[INDEX_SUB_ADDR] = MY_SUB_ADDR;
@@ -159,7 +159,7 @@ void main(void) {
 					case CMD_STATUS_LED:
                         switch (rx_buf[INDEX_ARG1]) {
                             case 0: //Apagar
-                                STAUTS_LED = 0;
+                                STATUS_LED = 0;
                                 break;
                             case 1: //Acender
                                 STATUS_LED = 1;
@@ -208,7 +208,7 @@ void iniciarIO(void){
  * @param repeat     [description]
  * @param delay_time [description]
  */
-void piscar_led( uint8_t repeat, uin16_t delay_time){
+void piscar_led( uint8_t repeat, uint16_t delay_time){
     while(repeat>0){
         STATUS_LED = !STATUS_LED; delay_ms(delay_time);
         STATUS_LED = !STATUS_LED; delay_ms(delay_time);

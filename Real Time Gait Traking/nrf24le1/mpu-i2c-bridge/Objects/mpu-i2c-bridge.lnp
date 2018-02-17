@@ -1,0 +1,6 @@
+".\Objects\main.obj",
+".\Objects\hal_w2_isr.obj",
+".\Objects\hal_delay.obj" 
+TO ".\Objects\mpu-i2c-bridge" 
+PRINT(".\Listings\mpu-i2c-bridge.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 

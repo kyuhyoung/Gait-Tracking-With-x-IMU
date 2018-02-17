@@ -1,0 +1,271 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              02/16/2018 23:31:17 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\libraries;C:\Nordic Semiconduc
+                    -tor\nRFgo SDK 2.3.0.10040\source_code\hal;C:\Nordic Semiconductor\nRFgo SDK 2.3.0.10040\source_code\hal\nrf24le1;C:\Nord
+                    -ic Semiconductor\nRFgo SDK 2.3.0.10040\source_code\compiler\common;C:\Nordic Semiconductor\nRFgo SDK 2.3.0.10040\source_
+                    -code\compiler\c51) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /* UNIVERSIDADE FEDERAL DE UBERLANDIA
+   2             BIOLAB - Biomedical Engineering Lab
+   3             Autor: Ítalo G S Fernandes
+   4             contact: italogsfernandes@gmail.com
+   5             URLs: https://github.com/italogfernandes
+   6             Description
+   7             Comandos:
+   8            * CMD_i2c_mpu_writeBytes:
+   9          
+  10                    Pacote:
+  11                      SUB_ADDR | CMD | regAddr | data_len | DATA_1 | ... | DATA_N
+  12                    Exemplo:
+  13          
+  14            * CMD_i2c_mpu_readBytes:
+  15                    Pacote:
+  16                      SUB_ADDR | CMD | regAddr | data_len
+  17                              Resposta:
+  18                                  SUB_ADDR | CMD | DATA_1 | ... | DATA_N
+  19                    Exemplo:
+  20          
+  21              * CMD_hal_w2_write:
+  22          
+  23                    Pacote:
+  24                      SUB_ADDR | CMD | address | data_len | DATA_1 | ... | DATA_N
+  25                    Exemplo:
+  26          
+  27            * CMD_hal_w2_read:
+  28                    Pacote:
+  29                      SUB_ADDR | CMD | address | data_len
+  30                              Resposta:
+  31                                  SUB_ADDR | CMD | DATA_1 | ... | DATA_N
+  32                    Exemplo:
+  33          
+  34              * CMD_FMW_VERSION:
+  35                    Retorna a versao do firmware, util para handshake.
+  36                    Pacote:
+  37                      SUB_ADDR | CMD
+  38                              Resposta:
+  39                                  SUB_ADDR | CMD | FIRMWARE_VERSION
+  40                    Exemplo:
+  41          
+  42              * CMD_STATUS_LED
+  43                              Coloca o led de status no nivel definido
+  44                              ESTADO = 0 -> apagado; 1 -> acesso; 2 -> Inverter; 3 -> Do nothing
+  45                              Pacote:
+  46                                  SUB_ADDR | CMD | ESTADO
+  47                              Resposta:
+  48                                  SUB_ADDR | CMD | ESTADO
+  49          
+  50          */
+  51          //////////////
+  52          //Libraries //
+C51 COMPILER V9.56.0.0   MAIN                                                              02/16/2018 23:31:17 PAGE 2   
+
+  53          //////////////
+  54          #include "nrf24le1.h"
+  55          #include "reg24le1.h" //Definicoes de muitos endere�os de registradores.
+  56          #include "nRF-SPICommands.h" //Comunicacao RF
+  57          #include "hal_delay.h" //Delays
+  58          #include "hal_w2_isr.h" //I2C
+  59          #include "string.h" //Funcao sendString utiliza strlen
+  60          
+  61          ////////////
+  62          //Defines //
+  63          ////////////
+  64          //COMANDOS da SPI-RF-BRIDGE
+  65          #define CMD_i2c_mpu_writeBytes  0x01
+  66          #define CMD_i2c_mpu_readBytes   0x02
+  67          #define CMD_hal_w2_write        0x03
+  68          #define CMD_hal_w2_read         0x04
+  69          #define CMD_FMW_VERSION     0x05
+  70          #define CMD_STATUS_LED      0x06
+  71          
+  72          //Constantes
+  73          #define FIRMWARE_VERSION        0x01
+  74          #define MY_SUB_ADDR             0x00
+  75          #define MPU6050_ADDRESS_AD0_LOW     0x68 // address pin low (GND), default for InvenSense evaluation board
+  76          #define MPU6050_ADDRESS_AD0_HIGH    0x69 // address pin high (VCC)
+  77          #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW
+  78          
+  79          //Protocolo
+  80          #define INDEX_SUB_ADDR  0
+  81          #define INDEX_CMD       1
+  82          #define INDEX_ARG1      2
+  83          #define INDEX_ARG2      3
+  84          #define INDEX_ARG3      4
+  85          //Pinos
+  86          #define STATUS_LED P02
+  87          
+  88          ////////////////
+  89          //Global Data //
+  90          ////////////////
+  91          bool handshake_ok = false;
+  92          
+  93          ///////////////////
+  94          //Implementation //
+  95          ///////////////////
+  96          void sendString(const char* msg);
+  97          void iniciarIO(void);
+  98          void piscar_led(uint8_t repeat, uint16_t delay_time);
+  99          
+ 100          void setup() {
+ 101   1          //Pinos
+ 102   1          iniciarIO(); piscar_led(1,250);
+ 103   1          //Radio Frequencia
+ 104   1          rf_init(ADDR_HOST,ADDR_HOST,92,RF_DATA_RATE_2Mbps,RF_TX_POWER_0dBm);
+ 105   1        sendString("\nNRF_V1\n\0"); delay_ms(10); piscar_led(1,250);
+ 106   1          //Interface I2C com os sensores
+ 107   1          hal_w2_configure_master(HAL_W2_100KHZ); piscar_led(1,250);
+ 108   1      }
+ 109          
+ 110          void main(void) {
+ 111   1          setup();
+ 112   1          while(1){ //Loop
+ 113   2              if(!handshake_ok){
+ 114   3                  piscar_led(2,500);
+C51 COMPILER V9.56.0.0   MAIN                                                              02/16/2018 23:31:17 PAGE 3   
+
+ 115   3              }
+ 116   2          if(newPayload){ //Se recebeu um novo pacote via RF
+ 117   3                  sta = 0; newPayload = 0; //Limpa as flags de status
+ 118   3                  if(rx_buf[INDEX_SUB_ADDR] == MY_SUB_ADDR){ //verifica se o sinal eh direcionado para mim
+ 119   4                      switch(rx_buf[INDEX_CMD]){
+ 120   5                          case CMD_i2c_mpu_writeBytes:
+ 121   5                              i2c_mpu_writeBytes(
+ 122   5                                  MPU6050_DEFAULT_ADDRESS,
+ 123   5                                  rx_buf[INDEX_ARG1],
+ 124   5                                  rx_buf[INDEX_ARG2],
+ 125   5                                  &rx_buf[INDEX_ARG3]);
+ 126   5                              break;
+ 127   5                          case CMD_i2c_mpu_readBytes:
+ 128   5                              tx_buf[INDEX_SUB_ADDR] = MY_SUB_ADDR;
+ 129   5                              tx_buf[INDEX_CMD] = CMD_i2c_mpu_readBytes;
+ 130   5                              i2c_mpu_readBytes(
+ 131   5                                  MPU6050_DEFAULT_ADDRESS,
+ 132   5                                  rx_buf[INDEX_ARG1],
+ 133   5                                  rx_buf[INDEX_ARG2],
+ 134   5                                  &tx_buf[INDEX_ARG1]);
+ 135   5                              TX_Mode_NOACK(rx_buf[INDEX_ARG2]+2); //Len = Len + 2 bytes
+ 136   5                              break;
+ 137   5                          case CMD_hal_w2_write:
+ 138   5                              hal_w2_write(
+ 139   5                                  rx_buf[INDEX_ARG1],
+ 140   5                                  &rx_buf[INDEX_ARG3],
+ 141   5                                  rx_buf[INDEX_ARG2]);
+ 142   5                              break;
+ 143   5                          case CMD_hal_w2_read:
+ 144   5                              tx_buf[INDEX_SUB_ADDR] = MY_SUB_ADDR;
+ 145   5                              tx_buf[INDEX_CMD] = CMD_hal_w2_read;
+ 146   5                              hal_w2_read(
+ 147   5                                  rx_buf[INDEX_ARG1],
+ 148   5                                  &tx_buf[INDEX_ARG1],
+ 149   5                                  rx_buf[INDEX_ARG2]);
+ 150   5                              TX_Mode_NOACK(rx_buf[INDEX_ARG2]+2); //Len = Len + 2 bytes
+ 151   5                              break;
+ 152   5                          case CMD_FMW_VERSION:
+ 153   5                              tx_buf[INDEX_SUB_ADDR] = MY_SUB_ADDR;
+ 154   5                              tx_buf[INDEX_CMD] = CMD_STATUS_LED;
+ 155   5                              tx_buf[INDEX_ARG1] = FIRMWARE_VERSION;
+ 156   5                              TX_Mode_NOACK(3);
+ 157   5                              handshake_ok = true;
+ 158   5                              break;
+ 159   5                case CMD_STATUS_LED:
+ 160   5                              switch (rx_buf[INDEX_ARG1]) {
+ 161   6                                  case 0: //Apagar
+ 162   6                                      STATUS_LED = 0;
+ 163   6                                      break;
+ 164   6                                  case 1: //Acender
+ 165   6                                      STATUS_LED = 1;
+ 166   6                                      break;
+ 167   6                                  case 2: //Inverter
+ 168   6                                      STATUS_LED = !STATUS_LED;
+ 169   6                                      break;
+ 170   6                                  default: //Do Nothing
+ 171   6                                      break;
+ 172   6                              }
+ 173   5                              tx_buf[INDEX_SUB_ADDR] = MY_SUB_ADDR;
+ 174   5                              tx_buf[INDEX_CMD] = CMD_STATUS_LED;
+ 175   5                              tx_buf[INDEX_ARG1] = STATUS_LED;
+ 176   5                              TX_Mode_NOACK(3);
+C51 COMPILER V9.56.0.0   MAIN                                                              02/16/2018 23:31:17 PAGE 4   
+
+ 177   5                              break;
+ 178   5                default:
+ 179   5                              piscar_led(2,250); //Pisca led 2 vezes indicando erro
+ 180   5                              break;
+ 181   5                      } /*switch(rx_buf[INDEX_CMD])*/
+ 182   4                  } /*if(rx_buf[INDEX_SUB_ADDR] == MY_SUB_ADDR)*/
+ 183   3              } /*if(newPayload)*/
+ 184   2          } /*while(1)*/
+ 185   1      } /*void main(void)*/
+ 186          
+ 187          /**
+ 188          * Iniciar os pinos de In e Out
+ 189          * Padrão = 0 = OUT
+ 190          * P00 e P01 = IN = Cristal - Built-In
+ 191          * P02 = 1 = IN = STAUTS_LED
+ 192          * P04 = 0 = IN = SCL
+ 193          */
+ 194          void iniciarIO(void){
+ 195   1         P0DIR = 0x00;    // Tudo output
+ 196   1         P1DIR = 0x00;    // Tudo output
+ 197   1         P0CON = 0x00;
+ 198   1         P1CON = 0x00;    //Reseting PxCON registers
+ 199   1      
+ 200   1         P0DIR &= ~(1<<4);//P04 = w2scl = output
+ 201   1         P0DIR &= ~(1<<2);//P02 = Status led = output
+ 202   1      
+ 203   1         P1CON |= 0x53; // All general I/O 0101 0011
+ 204   1      }
+ 205          
+ 206          /**
+ 207           * Pisca o led de status (P02)
+ 208           * @param repeat     [description]
+ 209           * @param delay_time [description]
+ 210           */
+ 211          void piscar_led( uint8_t repeat, uint16_t delay_time){
+ 212   1          while(repeat>0){
+ 213   2              STATUS_LED = !STATUS_LED; delay_ms(delay_time);
+ 214   2              STATUS_LED = !STATUS_LED; delay_ms(delay_time);
+ 215   2              repeat--;
+ 216   2          }
+ 217   1      }
+ 218          
+ 219          /**
+ 220           * Envia uma string como um pacote RF
+ 221           * @param msg string a ser enviada
+ 222           */
+ 223          void sendString(const char* msg){
+ 224   1        uint8_t msglen = strlen(msg);
+ 225   1        uint8_t i = 0;
+ 226   1        for(i = 0; i < msglen; i++){
+ 227   2          tx_buf[i] = msg[i];
+ 228   2        }
+ 229   1        TX_Mode_NOACK(msglen);
+ 230   1      }
+ 231          
+ 232          /**
+ 233           * Interrupção do I2C - NOTE: Don't know why this should be here, but it works
+ 234           */
+ 235          void I2C_IRQ (void) interrupt INTERRUPT_SERIAL {
+ 236   1          I2C_IRQ_handler();
+ 237   1      }
+
+C51 COMPILER V9.56.0.0   MAIN                                                              02/16/2018 23:31:17 PAGE 5   
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1010    ----
+   CONSTANT SIZE    =     15    ----
+   XDATA SIZE       =     65    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2      27
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
