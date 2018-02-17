@@ -151,7 +151,7 @@ void main(void) {
                         break;
                     case CMD_FMW_VERSION:
                         tx_buf[INDEX_SUB_ADDR] = MY_SUB_ADDR;
-                        tx_buf[INDEX_CMD] = CMD_STATUS_LED;
+                        tx_buf[INDEX_CMD] = CMD_FMW_VERSION;
                         tx_buf[INDEX_ARG1] = FIRMWARE_VERSION;
                         TX_Mode_NOACK(3);
                         handshake_ok = true;

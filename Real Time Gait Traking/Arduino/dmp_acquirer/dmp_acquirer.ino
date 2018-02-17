@@ -25,7 +25,7 @@
     So the output will be in ASCII instead of binary data.
 */
 #define ACCEL_GYRO_FROM_DMP //If enabled the accel and gyro data will come from the DMP
-//#define DEBUG_MODE
+#define DEBUG_MODE
 
 //Se estiver no modo debug printa as msg debug, se nao estiver nao printa
 #ifdef DEBUG_MODE
