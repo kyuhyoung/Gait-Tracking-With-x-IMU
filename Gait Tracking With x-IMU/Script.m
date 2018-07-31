@@ -1,9 +1,10 @@
+%%
 clear;
 close all;
 clc;
 addpath('Quaternions');
 addpath('ximu_matlab_library');
-
+%%
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
@@ -12,12 +13,12 @@ addpath('ximu_matlab_library');
 % startTime = 8;
 % stopTime = 37.5;
 
-%Fs = 100
+% Fs = 100
 % filePath = 'Biolab-Datasets/coleta2';
 % startTime = 8;
 % stopTime = 35;
 
-Fs = 100
+Fs = 100;
 filePath = 'Biolab-Datasets/coleta3';
 startTime = 8;
 stopTime = 55;
@@ -69,7 +70,7 @@ stopTime = 55;
 % stopTime = 47;
 
 % -------------------------------------------------------------------------
-% Import data
+%% Import data
 
 samplePeriod = 1/Fs;
 xIMUdata = xIMUdataClass(filePath, 'InertialMagneticSampleRate', 1/samplePeriod);
@@ -81,8 +82,9 @@ accX = xIMUdata.CalInertialAndMagneticData.Accelerometer.X;
 accY = xIMUdata.CalInertialAndMagneticData.Accelerometer.Y;
 accZ = xIMUdata.CalInertialAndMagneticData.Accelerometer.Z;
 clear('xIMUdata');
+
 % -------------------------------------------------------------------------
-% Manually frame data
+%% Manually frame data
 
 % startTime = 0;
 % stopTime = 10;
@@ -97,7 +99,7 @@ accY = accY(indexSel, :);
 accZ = accZ(indexSel, :);
 
 % -------------------------------------------------------------------------
-% Detect stationary periods
+%% Detect stationary periods
 
 % Compute accelerometer magnitude
 acc_mag = sqrt(accX.*accX + accY.*accY + accZ.*accZ);
@@ -126,7 +128,7 @@ disp(['Limiar Fixo = ', num2str(stationary_threshold)]);
 stationary = acc_magFilt < 0.05;
 
 % -------------------------------------------------------------------------
-% Plot data raw sensor data and stationary periods
+%% Plot data raw sensor data and stationary periods
 figure('Position', [1300 10 900 600], 'Name', 'Sensor Data');
 ax(1) = subplot(2,1,1);
     hold on; grid on;
@@ -153,7 +155,7 @@ ax(2) = subplot(2,1,2);
 linkaxes(ax,'x');
 
 % -------------------------------------------------------------------------
-% Compute orientation
+%% Compute orientation
 
 quat = zeros(length(time), 4);
 AHRSalgorithm = AHRS('SamplePeriod', 1/Fs, 'Kp', 1, 'KpInit', 1);
@@ -177,7 +179,7 @@ for t = 1:length(time)
 end
 
 % -------------------------------------------------------------------------
-% Compute translational accelerations
+%% Compute translational accelerations
 
 % Rotate body accelerations to Earth frame
 acc = quaternRotate([accX accY accZ], quaternConj(quat));
@@ -188,7 +190,7 @@ acc = quaternRotate([accX accY accZ], quaternConj(quat));
 % Convert acceleration measurements to m/s/s
 acc = acc * 9.81;
 
-% Plot translational accelerations
+%% Plot translational accelerations
 figure('Position', [1300 10 900 300], 'Name', 'Accelerations');
 hold on; grid on;
 plot(time, acc(:,1), 'r');
@@ -201,7 +203,7 @@ legend('X', 'Y', 'Z');
 hold off;
 
 % -------------------------------------------------------------------------
-% Compute translational velocities
+%% Compute translational velocities
 
 acc(:,3) = acc(:,3) - 9.81;
 
@@ -229,7 +231,7 @@ end
 % Remove integral drift
 vel = vel - velDrift;
 
-% Plot translational velocity
+%% Plot translational velocity
 figure('Position', [1300 10 900 300], 'Name', 'Velocity');
 hold on; grid on;
 plot(time, vel(:,1), 'r');
@@ -242,7 +244,7 @@ legend('X', 'Y', 'Z');
 hold off;
 
 % -------------------------------------------------------------------------
-% Compute translational position
+%% Compute translational position
 
 % Integrate velocity to yield position
 pos = zeros(size(vel));
@@ -250,22 +252,32 @@ for t = 2:length(pos)
     pos(t,:) = pos(t-1,:) + vel(t,:) * samplePeriod;    % integrate velocity to yield position
 end
 
-% Plot translational position
-figure('Position', [1300 10 900 600], 'Name', 'Position');
+
+%% rotação de base para corrigir o alinhamento do sensor
+th = atan2(15, 98);
+x_ = pos(:,1);
+y_ = pos(:,2);
+u_ = y_.*sin(-th) + x_.*cos(-th);
+v_ = y_.*cos(-th) - x_.*sin(-th);
+pos(:,1) = u_;
+pos(:,2) = v_;
+%% Plot translational position
+figure('Position', [1300 10 900 600], 'Name', 'Posição');
 hold on; grid on;
-plot(time, pos(:,1), 'r');
-plot(time, pos(:,2), 'g');
-plot(time, pos(:,3), 'b');
-title('Position');
-xlabel('Time (s)');
-ylabel('Position (m)');
+plot(time, pos(:,1)*100, 'r', 'linewidth', 2);
+plot(time, pos(:,2)*100, 'g', 'linewidth', 2);
+plot(time, pos(:,3)*100, 'b', 'linewidth', 2);
+title('Posição');
+xlabel('Tempo (s)');
+ylabel('Posição (cm)');
 legend('X', 'Y', 'Z');
 hold off;
+xlim([8, 52])
 
 disp('Erro em Z: ')
 disp(abs(pos(length(pos),3)))
 % -------------------------------------------------------------------------
-% Plot 3D foot trajectory
+%% Plot 3D foot trajectory
 
 % % Remove stationary periods from data to plot
 % posPlot = pos(find(~stationary), :);
@@ -274,13 +286,13 @@ posPlot = pos;
 quatPlot = quat;
 
 % Extend final sample to delay end of animation
-extraTime = 20;
+extraTime = 2;
 onesVector = ones(extraTime*(1/samplePeriod), 1);
 posPlot = [posPlot; [posPlot(end, 1)*onesVector, posPlot(end, 2)*onesVector, posPlot(end, 3)*onesVector]];
 quatPlot = [quatPlot; [quatPlot(end, 1)*onesVector, quatPlot(end, 2)*onesVector, quatPlot(end, 3)*onesVector, quatPlot(end, 4)*onesVector]];
 
 % Create 6 DOF animation
-SamplePlotFreq = 4;
+SamplePlotFreq = 2;
 Spin = 120;
 SixDofAnimation(posPlot, quatern2rotMat(quatPlot), ...
                 'SamplePlotFreq', SamplePlotFreq, 'Trail', 'All', ...
